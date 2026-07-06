@@ -53,7 +53,7 @@ for bot in "${BOTS[@]}"; do
                 echo "WOULD MERGE  [${bot}] ${repo} #${number}  ${url}"
             else
                 echo "MERGING      [${bot}] ${repo} #${number}  ${url}"
-                gh pr merge "$number" --repo "$repo" --squash --delete-branch
+                gh pr merge "$number" --repo "$repo" --squash --delete-branch --body ""
             fi
         else
             echo "SKIP         [${bot}] ${repo} #${number}  mergeable=${mergeable} status=${status}  ${url}"
