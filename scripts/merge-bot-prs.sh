@@ -4,16 +4,16 @@
 # conflict-free.
 #
 # Usage:
-#   ./scripts/merge-bot-prs.sh          # merge everything that's ready
-#   ./scripts/merge-bot-prs.sh --dry-run  # only print what would happen
+#   ./scripts/merge-bot-prs.sh          # dry run: only print what would happen
+#   ./scripts/merge-bot-prs.sh --apply  # actually merge everything that's ready
 #
 # Requires: gh (authenticated with repo scope), jq
 
 set -euo pipefail
 
-DRY_RUN=0
-if [[ "${1:-}" == "--dry-run" ]]; then
-    DRY_RUN=1
+DRY_RUN=1
+if [[ "${1:-}" == "--apply" ]]; then
+    DRY_RUN=0
 fi
 
 ORG="feincms"

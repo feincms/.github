@@ -13,8 +13,8 @@ and conflict-free. PRs that are still running CI, failing, or have merge
 conflicts are skipped and printed so they can be handled separately.
 
 ```console
-$ ./scripts/merge-bot-prs.sh --dry-run   # preview only
-$ ./scripts/merge-bot-prs.sh             # actually merge
+$ ./scripts/merge-bot-prs.sh          # preview only (default)
+$ ./scripts/merge-bot-prs.sh --apply  # actually merge
 ```
 
 Requires the [`gh` CLI](https://cli.github.com/) (authenticated, `repo` scope)
