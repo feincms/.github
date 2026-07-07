@@ -19,3 +19,16 @@ $ ./scripts/merge-bot-prs.sh --apply  # actually merge
 
 Requires the [`gh` CLI](https://cli.github.com/) (authenticated, `repo` scope)
 and `jq`.
+
+### `scripts/add-dependabot-config.sh`
+
+Adds `.github/dependabot.yml` to every repo in the org that doesn't already
+have one, picking ecosystems (`github-actions`, `pip`, `npm`) based on what's
+actually present in the repo (workflow files, `setup.py`/`setup.cfg`/
+`pyproject.toml`, `package.json`). Repos with no recognizable ecosystem are
+skipped. Commits the file directly to each repo's default branch.
+
+```console
+$ ./scripts/add-dependabot-config.sh          # preview only (default)
+$ ./scripts/add-dependabot-config.sh --apply  # actually create the files
+```
