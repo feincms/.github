@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # Squash-merge open bot pull requests (pre-commit.ci autoupdate, dependabot)
-# across the feincms GitHub org, but only the ones that are green and
+# across a list of GitHub orgs/users, but only the ones that are green and
 # conflict-free.
 #
 # Usage:
@@ -16,7 +16,9 @@ if [[ "${1:-}" == "--apply" ]]; then
     DRY_RUN=0
 fi
 
-ORG="feincms"
+# Owners to search across - GitHub orgs and/or individual users, gh doesn't
+# distinguish between the two for the --owner search qualifier.
+OWNERS=("feincms" "matthiask" "feinheit")
 BOTS=("pre-commit-ci" "dependabot")
 
 classify() {
@@ -36,8 +38,13 @@ classify() {
         end'
 }
 
+owner_flags=()
+for owner in "${OWNERS[@]}"; do
+    owner_flags+=(--owner "$owner")
+done
+
 for bot in "${BOTS[@]}"; do
-    gh search prs --owner "$ORG" --state open --app "$bot" --json repository,number,url --limit 100 \
+    gh search prs "${owner_flags[@]}" --state open --app "$bot" --json repository,number,url --limit 100 \
     | jq -c '.[]' \
     | while read -r pr; do
         repo=$(echo "$pr" | jq -r '.repository.nameWithOwner')
