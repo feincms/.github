@@ -44,7 +44,10 @@ for owner in "${OWNERS[@]}"; do
 done
 
 for bot in "${BOTS[@]}"; do
-    gh search prs "${owner_flags[@]}" --state open --app "$bot" --json repository,number,url --limit 100 \
+    # --archived=false keeps PRs on archived repos out of the results; they can
+    # never be merged anyway.
+    gh search prs "${owner_flags[@]}" --state open --app "$bot" --archived=false \
+        --json repository,number,url --limit 100 \
     | jq -c '.[]' \
     | while read -r pr; do
         repo=$(echo "$pr" | jq -r '.repository.nameWithOwner')
