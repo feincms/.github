@@ -48,25 +48,25 @@ for bot in "${BOTS[@]}"; do
     # never be merged anyway.
     gh search prs "${owner_flags[@]}" --state open --app "$bot" --archived=false \
         --json repository,number,url --limit 100 \
-    | jq -c '.[]' \
-    | while read -r pr; do
-        repo=$(echo "$pr" | jq -r '.repository.nameWithOwner')
-        number=$(echo "$pr" | jq -r '.number')
-        url=$(echo "$pr" | jq -r '.url')
+        | jq -c '.[]' \
+        | while read -r pr; do
+            repo=$(echo "$pr" | jq -r '.repository.nameWithOwner')
+            number=$(echo "$pr" | jq -r '.number')
+            url=$(echo "$pr" | jq -r '.url')
 
-        data=$(gh pr view "$number" --repo "$repo" --json mergeable,statusCheckRollup)
-        mergeable=$(echo "$data" | jq -r '.mergeable')
-        status=$(classify "$data")
+            data=$(gh pr view "$number" --repo "$repo" --json mergeable,statusCheckRollup)
+            mergeable=$(echo "$data" | jq -r '.mergeable')
+            status=$(classify "$data")
 
-        if [[ "$mergeable" == "MERGEABLE" && "$status" == "READY" ]]; then
-            if [[ "$DRY_RUN" == "1" ]]; then
-                echo "WOULD MERGE  [${bot}] ${repo} #${number}  ${url}"
+            if [[ "$mergeable" == "MERGEABLE" && "$status" == "READY" ]]; then
+                if [[ "$DRY_RUN" == "1" ]]; then
+                    echo "WOULD MERGE  [${bot}] ${repo} #${number}  ${url}"
+                else
+                    echo "MERGING      [${bot}] ${repo} #${number}  ${url}"
+                    gh pr merge "$number" --repo "$repo" --squash --delete-branch --body ""
+                fi
             else
-                echo "MERGING      [${bot}] ${repo} #${number}  ${url}"
-                gh pr merge "$number" --repo "$repo" --squash --delete-branch --body ""
+                echo "SKIP         [${bot}] ${repo} #${number}  mergeable=${mergeable} status=${status}  ${url}"
             fi
-        else
-            echo "SKIP         [${bot}] ${repo} #${number}  mergeable=${mergeable} status=${status}  ${url}"
-        fi
-    done
+        done
 done
