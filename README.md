@@ -32,3 +32,17 @@ skipped. Commits the file directly to each repo's default branch.
 $ ./scripts/add-dependabot-config.sh          # preview only (default)
 $ ./scripts/add-dependabot-config.sh --apply  # actually create the files
 ```
+
+### `scripts/normalize-repo-settings.sh`
+
+Makes repository settings consistent across every non-archived repo of the
+`feincms` and `feinheit` owners. The desired settings are listed in the
+`SETTINGS` array at the top of the script as `field=value` pairs using the
+[REST API field names](https://docs.github.com/en/rest/repos/repos#update-a-repository)
+(currently only `delete_branch_on_merge=true`). Only settings which differ are
+changed; repos you don't have admin permission on are skipped.
+
+```console
+$ ./scripts/normalize-repo-settings.sh          # preview only (default)
+$ ./scripts/normalize-repo-settings.sh --apply  # actually change the settings
+```
