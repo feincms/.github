@@ -10,7 +10,8 @@ GitHub organization.
 Finds all open pull requests from pre-commit.ci and dependabot across every
 repo in the org and squash-merges the ones that are green (all checks passed)
 and conflict-free. PRs that are still running CI, failing, or have merge
-conflicts are skipped and printed so they can be handled separately.
+conflicts are skipped and printed so they can be handled separately. PRs in
+repos you don't have push permission on are skipped as well.
 
 ```console
 $ ./scripts/merge-bot-prs.sh          # preview only (default)

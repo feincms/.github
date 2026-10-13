@@ -18,7 +18,7 @@ fi
 
 # Owners to search across - GitHub orgs and/or individual users, gh doesn't
 # distinguish between the two for the --owner search qualifier.
-OWNERS=("feincms" "matthiask" "feinheit")
+OWNERS=("feincms" "matthiask" "feinheit" "django-commons")
 BOTS=("pre-commit-ci" "dependabot")
 
 classify() {
@@ -54,6 +54,13 @@ for bot in "${BOTS[@]}"; do
             number=$(echo "$pr" | jq -r '.number')
             url=$(echo "$pr" | jq -r '.url')
 
+            # Owners like django-commons contain repos we can't push to, and
+            # therefore can't merge PRs in.
+            if [[ "$(gh api "repos/${repo}" --jq '.permissions.push')" != "true" ]]; then
+                echo "SKIP         [${bot}] ${repo} #${number}  (no push permission)  ${url}"
+                continue
+            fi
+
             data=$(gh pr view "$number" --repo "$repo" --json mergeable,statusCheckRollup)
             mergeable=$(echo "$data" | jq -r '.mergeable')
             status=$(classify "$data")
@@ -63,7 +70,11 @@ for bot in "${BOTS[@]}"; do
                     echo "WOULD MERGE  [${bot}] ${repo} #${number}  ${url}"
                 else
                     echo "MERGING      [${bot}] ${repo} #${number}  ${url}"
-                    gh pr merge "$number" --repo "$repo" --squash --delete-branch --body ""
+                    # Branch protection rules etc. may still prevent merging,
+                    # carry on with the remaining PRs.
+                    if ! gh pr merge "$number" --repo "$repo" --squash --delete-branch --body ""; then
+                        echo "FAILED       [${bot}] ${repo} #${number}  ${url}"
+                    fi
                 fi
             else
                 echo "SKIP         [${bot}] ${repo} #${number}  mergeable=${mergeable} status=${status}  ${url}"
