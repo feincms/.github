@@ -18,7 +18,7 @@ fi
 
 # Owners to search across - GitHub orgs and/or individual users, gh doesn't
 # distinguish between the two for the --owner search qualifier.
-OWNERS=("feincms" "matthiask" "feinheit" "django-commons")
+OWNERS=("feincms" "matthiask" "feinheit")
 BOTS=("pre-commit-ci" "dependabot")
 
 classify() {
