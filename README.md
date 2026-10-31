@@ -47,3 +47,19 @@ changed; repos you don't have admin permission on are skipped.
 $ ./scripts/normalize-repo-settings.sh          # preview only (default)
 $ ./scripts/normalize-repo-settings.sh --apply  # actually change the settings
 ```
+
+### `scripts/enable-code-scanning.sh`
+
+Enables CodeQL code scanning ([default
+setup](https://docs.github.com/en/code-security/code-scanning/enabling-code-scanning/configuring-default-setup-for-code-scanning))
+on every public, non-archived repo of the `feincms` and `feinheit` owners which
+doesn't have it yet. Code scanning is free for public repos; private repos are
+left alone since they'd need a Code Security license. GitHub picks the
+languages itself and scans pushes and pull requests to the default branch plus
+once a week. Repos without a language CodeQL supports fail and are reported;
+repos you don't have admin permission on are skipped.
+
+```console
+$ ./scripts/enable-code-scanning.sh          # preview only (default)
+$ ./scripts/enable-code-scanning.sh --apply  # actually enable code scanning
+```
