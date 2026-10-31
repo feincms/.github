@@ -40,8 +40,10 @@ Makes repository settings consistent across every non-archived repo of the
 `feincms` and `feinheit` owners. The desired settings are listed in the
 `SETTINGS` array at the top of the script as `field=value` pairs using the
 [REST API field names](https://docs.github.com/en/rest/repos/repos#update-a-repository)
-(currently only `delete_branch_on_merge=true`). Only settings which differ are
-changed; repos you don't have admin permission on are skipped.
+(currently only `delete_branch_on_merge=true`). It also enables Dependabot
+alerts (free for private repos too; only the alerts, not the security update
+pull requests). Only settings which differ are changed; repos you don't have
+admin permission on are skipped.
 
 ```console
 $ ./scripts/normalize-repo-settings.sh          # preview only (default)

@@ -24,6 +24,10 @@ SETTINGS=(
     "delete_branch_on_merge=true"
 )
 
+# Enable Dependabot alerts (free for private repos as well). Only the alerts,
+# not Dependabot security updates, which would open pull requests.
+DEPENDABOT_ALERTS=1
+
 for owner in "${OWNERS[@]}"; do
     # Archived repos are read-only, their settings cannot be changed.
     gh repo list "$owner" --limit 1000 --no-archived --json nameWithOwner \
@@ -49,6 +53,15 @@ for owner in "${OWNERS[@]}"; do
                 fi
             done
 
+            # Dependabot alerts aren't a field of the repository resource, the
+            # endpoint answers 204 if they are enabled and 404 if not.
+            enable_alerts=0
+            if [[ "$DEPENDABOT_ALERTS" == "1" ]] \
+                && ! gh api "repos/${repo}/vulnerability-alerts" --silent 2>/dev/null; then
+                enable_alerts=1
+                changes+=("dependabot alerts: off -> on")
+            fi
+
             if [[ "${#changes[@]}" -eq 0 ]]; then
                 echo "OK         ${repo}"
                 continue
@@ -61,7 +74,12 @@ for owner in "${OWNERS[@]}"; do
             if [[ "$DRY_RUN" == "1" ]]; then
                 echo "WOULD SET  ${repo}  (${summary})"
             else
-                gh api --method PATCH "repos/${repo}" "${flags[@]}" >/dev/null
+                if [[ "${#flags[@]}" -gt 0 ]]; then
+                    gh api --method PATCH "repos/${repo}" "${flags[@]}" >/dev/null
+                fi
+                if [[ "$enable_alerts" == "1" ]]; then
+                    gh api --method PUT "repos/${repo}/vulnerability-alerts" --silent
+                fi
                 echo "SET        ${repo}  (${summary})"
             fi
         done
